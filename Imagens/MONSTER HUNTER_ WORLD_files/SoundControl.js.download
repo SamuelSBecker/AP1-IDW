@@ -1,0 +1,307 @@
+/*
+ * Copyright (c) 2017 Ryuji Fukunaga
+ * Licensed under the MIT license.
+ * http://opensource.org/licenses/MIT
+ *
+ * Author: Ryuji Fukunaga
+ * Version: 1.0.1
+ * Date: 22th June 2017
+ */
+SOUND_CONTROL = function(opt){
+  this.create(opt);
+};
+SOUND_CONTROL.prototype = {
+  constructor: SOUND_CONTROL,
+  create: function(opt) {
+    var defaults = {
+        isSP_Enable_Bgm: false,
+        isSP_Enable_Se: false,
+        bgmVolume: 1,
+        bgmLoopType: "single",  // single,all,none
+        isBgmControl: false,
+        isBgmPause: false,
+        loadTrigger: "",
+        seBefore: function(){},
+        seEnded: function(){}
+    };
+
+    var settings = $.extend(defaults, opt);
+    this.isSP_Enable_Bgm = settings.isSP_Enable_Bgm;
+    this.isSP_Enable_Se = settings.isSP_Enable_Se;
+    this.isBgmPause = settings.isBgmPause;
+    this.nowBgmID = 0;
+    this.bgmElem = [];
+    this.bgmObj = [];
+    this.bgmLoopType = settings.bgmLoopType;
+    this.bgmVolume = settings.bgmVolume;
+    this.se = {};
+    this.loadingAudio = 0;
+    this.allLoaded = false;
+    this.isBgmControl = settings.isBgmControl;
+    this.loadTrigger = settings.loadTrigger;
+    this.seVolume = settings.seVolume;
+    this.seBefore = settings.seBefore;
+    this.seEnded = settings.seEnded;
+    this.init();
+  }
+};
+SOUND_CONTROL.prototype.init = function() {
+    var self = this;
+    var ua = navigator.userAgent.toLowerCase();
+    if (ua.indexOf("ipad") != -1 ||
+        ua.indexOf("iphone") != -1 ||
+        ua.indexOf("android") != -1){
+        self.isSP = true;
+    }
+
+    if(!self.isSP_Enable_Bgm && !self.isSP_Enable_Se && self.isSP) return false; 
+
+    if(self.loadTrigger.length > 0) {
+        self.loadTrigger.on("click", function(){
+            self.loadAudio();
+        });
+    }
+    else {
+        self.loadAudio();
+    }
+};
+SOUND_CONTROL.prototype.loadAudio = function(){
+    var self = this;
+
+    if(!self.isSP_Enable_Bgm && self.isSP) {}
+    else {
+        var $target = $("[data-bgm]").data("bgm");
+        if($target) {
+            var length = $target.length;
+            for(var i = 0; i < length; i++) {
+                var audioElem = new Audio();
+                audioElem.src = $target[i];
+                self.bgmObj[i] = audioElem;
+                if(self.bgmLoopType == "all" || self.bgmLoopType == "none") {
+                    self.bgmObj[i].loop = false;
+                }
+                else {
+                    self.bgmObj[i].loop = true;   
+                }
+                self.bgmObj[i].volume = 1;
+                self.bgmObj[i].load();
+                self.bgmObj[i].title = "";
+                self.loadingAudio++;
+                self.bgmObj[i].oncanplay = function(){
+                    self.loadComplete();
+                };
+            }
+        }
+    }
+    if(!self.isSP_Enable_Se && self.isSP) {}
+    else {
+        var $targetList = $("[data-se]");
+        var targetLength = $targetList.length;
+        var seIndex = 0;
+        if($targetList) {
+            for(var j = 0; j < targetLength; j++) {
+                var $target = $targetList.eq(j).data("se");
+                var length = $target.length;
+                $targetList.eq(j).attr({ "data-se-id": seIndex });
+                self.se[seIndex] = {
+                    seID: "",
+                    seObj: "",
+                    seElem: "",
+                    sePlaying: false
+                };
+                for(var i = 0; i < length; i++) {
+                    var audioElem = new Audio();
+                    audioElem.src = $target[i];
+                    self.se[seIndex] = {
+                        seID: seIndex,
+                        seObj: audioElem,
+                        seElem: $targetList.eq(j)
+                    };
+                    self.se[seIndex].seObj.volume = 1;
+                    self.se[seIndex].seObj.load();
+                    self.se[seIndex].seObj.title = "";
+                    self.loadingAudio++;
+                    self.se[seIndex].seObj.oncanplay = function(){
+                        self.loadComplete();
+                    };
+                    seIndex++;
+                }
+            }
+        }
+    }
+};
+SOUND_CONTROL.prototype.loadComplete = function() {
+    var self = this;
+    if(!self.allLoaded) {
+        self.loadingAudio--;
+        if(self.loadingAudio <= 0) {
+            self.loadingAudio = 0;
+            self.allLoaded = true;
+            self.bgmReady();
+            self.seReady();
+            self.allLoadComplete();
+        }
+    }
+};
+SOUND_CONTROL.prototype.bgmPlay = function(id) {
+    var self = this;
+    self.isBgmPause = false;
+    if(!self.isSP_Enable_Bgm && self.isSP) return false; 
+    var playID = self.nowBgmID;
+    if(id) {
+        if(id != "") playID = id;
+    }
+
+    if(playID != self.nowBgmID) {
+        self.bgmObj[self.nowBgmID].pause();
+    }
+    self.bgmButtonPlaying();
+    self.bgmObj[playID].play();
+};
+SOUND_CONTROL.prototype.bgmPause = function(isPopup) {
+    var self = this;
+    if(!isPopup) self.isBgmPause = true;
+    self.bgmButtonPause();
+    self.bgmObj[self.nowBgmID].pause();
+};
+SOUND_CONTROL.prototype.setBgmPosition = function(pos){
+    var self = this;
+    self.bgmObj[self.nowBgmID].currentTime = pos;
+};
+SOUND_CONTROL.prototype.changeBgmVolume = function(volume, duration, delay, isTemp, callback) {
+    var self = this;
+    if(!self.isBgmPause) {
+        if(!isTemp) self.bgmVolume = volume;
+        $(self.bgmObj[self.nowBgmID]).delay(delay).stop().animate({
+            volume: volume
+        }, duration, function(){
+            if(callback) callback();
+        });
+    }
+};
+SOUND_CONTROL.prototype.bgmButtonPause = function() {
+    var s = $("[data-bgm]").find("img").attr("src");
+    if(s) {
+        if(s.indexOf("_playing") != -1) {
+            s = s.replace("_playing", "_pause");
+            $("[data-bgm]").find("img").attr({ "src": s });
+        }
+    }
+}
+SOUND_CONTROL.prototype.bgmButtonPlaying = function() {
+    var s = $("[data-bgm]").find("img").attr("src");
+    if(s) {
+        if(s.indexOf("_pause") != -1) {
+            s = s.replace("_pause", "_playing");
+            $("[data-bgm]").find("img").attr({ "src": s });
+        }
+    }
+}
+SOUND_CONTROL.prototype.bgmReady = function(id) {
+    var self = this;
+    var length = self.bgmObj.length;
+    for(var i = 0; i < length; i++) {
+         self.bgmObj[i].onended = function(){
+            if(self.bgmLoopType == "all") {
+                self.nowBgmID++;
+                if(self.nowBgmID > self.bgmObj.length - 1) {
+                    self.nowBgmID = 0;
+                }
+                self.bgmPlay();
+            }
+            else if(self.bgmLoopType == "none") {
+                self.bgmButtonPause();
+            }
+        };
+    }
+    $("[data-bgm]").on("click", function(e){
+        e.preventDefault();
+        if(!self.isBgmPause) {
+            self.bgmPause();
+        }
+        else {
+            self.isBgmPause = false;
+            self.bgmPlay();
+        }
+    });
+};
+SOUND_CONTROL.prototype.seReady = function(id) {
+    var self = this;
+    var se = self.se;
+    var keys = Object.keys(se);
+    var length = keys.length;
+    for(var i = 0; i < length; i++) {
+        se[i].seObj.seID = i;
+        se[i].seObj.onended = function(){
+            var id = this.seID;
+            self.sePlayEnd(id);
+        };
+        se[i].seElem.on("click", function(e){
+            e.preventDefault();
+            var id = $(this).attr("data-se-id");
+            if(!self.se[id].sePlaying) {
+                if(!self.isSP_Enable_Bgm && self.isSP){}
+                else if(self.isBgmControl) self.changeBgmVolume(0.1, 0, false);
+                self.sePlay(id);
+            }
+            else {
+                self.stopSE(id);
+                self.sePlayEnd(id);
+            }
+        });
+    }
+};
+SOUND_CONTROL.prototype.sePlay = function(id) {
+    var self = this;
+    self.se[id].sePlaying = true;
+    self.seBefore();
+    var s = self.se[id].seElem.find("img").attr("src");
+    s = s.replace("_pause", "_playing");
+    self.se[id].seElem.find("img").attr({ "src": s });
+    self.se[id].seObj.play();
+};
+SOUND_CONTROL.prototype.sePlayEnd = function(id) {
+    var self = this;
+    self.se[id].sePlaying = false;
+    self.seEnded();
+    var s = self.se[id].seElem.find("img").attr("src");
+    s = s.replace("_playing", "_pause");
+    self.se[id].seElem.find("img").attr({ "src": s });
+    if(!self.isSP_Enable_Bgm && self.isSP) return false;
+    if(self.isBgmControl)self.changeBgmVolume(self.bgmVolume, 1000, 400);
+};
+SOUND_CONTROL.prototype.stopSE = function(id){
+    var self = this;
+    self.se[id].sePlaying = false;
+    self.se[id].seObj.currentTime = 0;
+    self.se[id].seObj.pause();
+};
+SOUND_CONTROL.prototype.stopOtherSE = function(id){
+    var self = this;
+    var se = self.se;
+    var keys = Object.keys(se);
+    var length = keys.length;
+    for(var i = 0; i < length; i++) {
+        if(id && i != id) {
+            se[i].sePlaying = false;
+            se[i].seObj.currentTime = 0;
+            se[i].seObj.pause();
+        }
+    }
+};
+SOUND_CONTROL.prototype.stopAllSE = function(id){
+    var self = this;
+    var se = self.se;
+    var keys = Object.keys(se);
+    var length = keys.length;
+    for(var i = 0; i < length; i++) {
+        se[i].sePlaying = false;
+        se[i].seObj.currentTime = 0;
+        se[i].seObj.pause();
+    }
+};
+SOUND_CONTROL.prototype.allLoadComplete = function(){
+    var self = this;
+    if(!self.bgmPlayis) self.isBgmPause();
+//    if(!self.isBgmPause) self.bgmPlay();
+};

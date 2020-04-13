@@ -1,0 +1,130 @@
+@charset "utf-8";
+#Gdpr.messageBox {
+	background: rgba(0,0,0,.8);
+	bottom: 0;
+	box-sizing: border-box;
+	position: fixed;
+	right: 0;
+	padding: 4vw;
+	width: 100%;
+	z-index: 999999;
+}
+#Gdpr.messageBox .text {
+	color: #ccc;
+	font-size: 3.75vw;
+	line-height: 1.25;
+	margin-bottom: 1em;
+}
+#Gdpr.messageBox .text .privacyPolicy {
+	color: #fff;
+	display: inline-block;
+	margin-left: 1em;
+	position: relative;
+	text-decoration: none;
+}
+#Gdpr.messageBox .text .privacyPolicy:after {
+    border-bottom: solid #ccc 1px;
+    bottom: -2px;
+    content: '';
+    display: block;
+    position: absolute;
+    width: 100%;
+}
+#Gdpr.messageBox .text .privacyPolicy:hover {
+	border-bottom: none;
+	opacity: 1;
+}
+#Gdpr.messageBox .linkBox {
+	margin: 0 auto;
+	text-align: center;
+	width: 60%;
+}
+#Gdpr.messageBox .linkBox #acceptBtn {
+	-webkit-backface-visibility: hidden;
+	backface-visibility: hidden;
+	background:  #000;
+	border: solid #fff 1px;
+	box-sizing: border-box;
+	color: #fff;
+	cursor: pointer;
+	display: inline-block;
+	font-size: 3.75vw;
+	line-height: 1.5;
+	padding: 2.5vw 5vw;
+	-webkit-tap-highlight-color: transparent;
+	tap-highlight-color: transparent;
+	-webkit-transition: background .25s ease, color .25s ease;
+	-moz-transition: background .25s ease, color .25s ease;
+	-ms-transition: background .25s ease, color .25s ease;
+	transition: background .25s ease, color .25s ease;
+	width: 100%;
+}
+#Gdpr.messageBox .linkBox #acceptBtn:active {
+	background: #fff;
+	color: #000;
+}
+#Gdpr.messageBox.active {
+	animation: BottomToTop .5s ease;
+}
+#Gdpr.messageBox.disable {
+	animation: TopToBottom .5s ease;
+}
+/*** PC ***/
+@media only screen and (min-width: 1023px) {
+	#Gdpr.messageBox {
+	    display: -ms-flexbox;
+	    display: -webkit-flex;
+	    display: flex;
+	    -webkit-flex-wrap: wrap;
+	    -ms-flex-wrap: wrap;
+	    flex-wrap: wrap;
+	    -webkit-box-align: center;
+	    -ms-flex-align: center;
+	    -webkit-align-items: center;
+	    align-items: center;
+	    -webkit-box-pack: center;
+	    -ms-flex-pack: center;
+	    -webkit-justify-content: center;
+	    justify-content: center;
+		padding: 2vw;
+		width: 100%;
+	}
+	#Gdpr.messageBox .text {
+		font-size: 87.5%;
+		margin-bottom: 0;
+	}
+	#Gdpr.messageBox .linkBox {
+		margin: 0 0 0 1em;
+		width: auto;
+	}
+	#Gdpr.messageBox .linkBox #acceptBtn {
+		font-size: 87.5%;
+		padding: .5vw 2vw;
+	}
+	#Gdpr.messageBox .linkBox #acceptBtn:hover {
+		background: #fff;
+		color: #000;
+		opacity: 1;
+	}
+}
+/*** animation ***/
+@keyframes BottomToTop {
+	0% {
+	    opacity: 0;
+	    transform: translateY(100%);
+	}
+	100% {
+	    opacity: 1;
+	    transform: translateY(0);
+	}
+}
+@keyframes TopToBottom {
+	0% {
+	    opacity: 1;
+	    transform: translateY(0);
+	}
+	100% {
+	    opacity: 0;
+	    transform: translateY(100%);
+	}
+}

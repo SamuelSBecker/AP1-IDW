@@ -1,0 +1,117 @@
+@charset "UTF-8";
+/************************************
+	eCRM
+************************************/
+html.eCrmActive,
+body.eCrmActive {
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+}
+#eCrmModal {
+  display: none;
+  height: 100%;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: -1;
+}
+#eCrmModal .modalOverlay {
+  background: rgba(0, 0, 0, 0.9);
+  cursor: pointer;
+  height: 100%;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 10;
+}
+#eCrmModal .modalConts,
+#eCrmModal .modalOpenState.eCrmActive {
+  box-sizing: border-box;
+  height: 100%;
+  left: 0;
+  margin: auto;
+  padding: 17.5% 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 11;
+  width: 100%;
+}
+#eCrmModal .eCrmIframe {
+  height: 100%;
+  width: 100%;
+}
+#eCrmModal .modalOpenState.eCrmActive {
+  top: 100%;
+  z-index: 99999;
+}
+#eCrmModal .modalClose {
+  cursor: pointer;
+  height: 4.78%;
+  max-height: 32px;
+  max-width: 32px;
+  position: absolute;
+  right: 4%;
+  top: 2%;
+  width: 8.5%;
+  z-index: 999999;
+}
+#eCrmModal .modalClose:before,
+#eCrmModal .modalClose:after {
+  background: #fff;
+  content: '';
+  height: 2px;
+  left: 0;
+  position: absolute;
+  top: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  width: 100%;
+}
+#eCrmModal .modalClose:before {
+  -webkit-transform: rotate(-315deg);
+  transform: rotate(-315deg);
+}
+#eCrmModal .modalClose:after {
+  -webkit-transform: rotate(315deg);
+  transform: rotate(315deg);
+}
+#eCrmModal.eCrmActive {
+  display: block;
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
+  z-index: 9999;
+}
+/*** SP（横） ***/
+@media only screen and (orientation: landscape) and (max-width: 767px) {
+  #eCrmModal .modalConts .box .boxInner {
+    padding: 4% 2%;
+  }
+  #eCrmModal .modalClose {
+    top: 4%;
+  }
+}
+/*----- PC -----*/
+@media only screen and (min-width: 1025px) {
+  #eCrmModal .modalClose {
+    height: 32px;
+    right: 32px;
+    top: 32px;
+    width: 32px;
+  }
+  #eCrmModal .modalConts,
+  #eCrmModal .modalOpenState.eCrmActive {
+    height: 75%;
+    margin: 10% auto 0;
+    /*max-width: 1026px;*/
+    padding: 0;
+
+  }
+  #eCrmModal.eCrmActive {
+    overflow-y: hidden;
+  }
+}

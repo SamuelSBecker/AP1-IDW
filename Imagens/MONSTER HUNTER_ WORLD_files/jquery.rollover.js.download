@@ -1,0 +1,87 @@
+/*画像のロールオーバー
+*********************************************************************************/
+$(function() {
+    var userAgent = window.navigator.userAgent.toLowerCase();
+    var appVersion = window.navigator.appVersion.toLowerCase();
+    if (userAgent.indexOf("msie") != -1) {
+        if (appVersion.indexOf("msie 8.") != -1) {
+            var images = $("img");
+            //画像の数だけループ
+            $("img").each(function() {
+                //画像が_dにマッチしたら
+                if($(this).attr("src").match("_d.")) {
+                    $(this).hover(function() {
+                        $(this).attr('src', $(this).attr("src").replace("_d.", "_on."));
+                    }, function() {
+                        $(this).attr('src', $(this).attr("src").replace("_on.", "_d."));
+                    });
+                }
+            });
+        }
+        else {
+            initHoverAnime();
+        }
+    }
+    else {
+        initHoverAnime();
+    }
+
+    function initHoverAnime() {
+        var length = $("a img").length;
+        $("a img").addClass("hover_off");
+        var $hoverOff = $(".hover_off");
+        for(var cnt = 0; cnt < length; cnt++) {
+
+            // offの要素を取得
+            var $imgHoveOff = $hoverOff.eq(cnt);
+
+            // onはoffの要素を元に作成
+            var $imgHoverOn = $imgHoveOff.clone(true);
+
+            // offのurlを取得して、onの物に置き換える
+            var imgUrl = $imgHoveOff.attr("src");
+            if(imgUrl.indexOf("_d") != -1) {
+                imgUrl = imgUrl.replace(/_d\./g , "_on.");
+
+                // クラスとurlを変更する
+                $imgHoverOn.attr({ "src": imgUrl }).removeClass("hover_off").addClass("hover_on");
+
+                // onの要素を追加
+                $imgHoveOff.parent().prepend($imgHoverOn);
+
+                if($imgHoveOff.parent().hasClass("current")) {
+                    $imgHoverOn.css({ opacity: 1 });
+                }
+            }
+        }
+
+        var $hoverOn = $(".hover_on");
+        $hoverOn.css({
+            position: "absolute",
+            top: 0,
+            left: 0,
+            opacity: 0
+        }).parent().css({
+            position: "relative",
+            display: "block"
+        });
+
+        $hoverOn.hover(function(){
+            $(this).velocity("stop").velocity({
+                opacity: 1
+            }, {
+                queue: false,
+                duration: 200,
+                easing: "ease"
+            });
+        }, function(){
+            $(this).velocity("stop").velocity({
+                opacity: 0
+            }, {
+                queue: false,
+                duration: 200,
+                easing: "ease"
+            });
+        });
+    }
+})

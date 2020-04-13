@@ -1,0 +1,27 @@
+// JavaScript Document
+$(function(){
+ $.ajax({
+    url: "topNotice.json",
+    cache: false,
+    type: "GET",
+    dataType: "json",
+    timeout: 10000
+  })
+  .done(function (data) {
+    var length = data.length;
+    var count = 0;
+    for (var i = 0; i < length; i++) {
+      if(count < 10) {
+				if(data[i].urls.length > 0) {
+					var target = data[i].target;
+          var title = data[i].title;
+          var urls = data[i].urls;
+					
+          var notice = '<li><a href=' + urls + ' target="' + target + '">' + title + '</a></li>';
+          $("#topNotice ul").append(notice);
+          count++;
+				}
+      }
+    }
+  });
+});

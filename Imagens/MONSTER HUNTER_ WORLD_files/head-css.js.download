@@ -1,0 +1,22 @@
+var inc_path = "";
+if(document.URL.indexOf("/web_dvp/") != -1) {
+	inc_path = "/web_dvp/original-domain/monsterhunterworld";
+}
+var html_c =
+// base layout
+'<link rel="stylesheet" type="text/css" href="../../common/css/ver2/reset.css">' +
+'<link rel="stylesheet" type="text/css" href="../../common/css/capcom_title06.css">' +
+// original layout
+'<link rel="stylesheet" href="' + inc_path + '/css/reset.css">' +
+'<link rel="stylesheet" href="' + inc_path + '/css/module.css">' +
+'<link rel="stylesheet" href="' + inc_path + '/css/common.css">' +
+'<link rel="stylesheet" href="' + inc_path + '/css/gdpr.css">' +
+'<link rel="stylesheet" href="' + inc_path + '/css/jquery.mb.YTPlayer.min.css">' +
+'<link rel="stylesheet" href="' + inc_path + '/css/common-animation.css">' +
+'<link rel="stylesheet" href="' + inc_path + '/css/top.css">' +
+'<link rel="stylesheet" href="' + inc_path + '/css/layout.css">' +
+'<link rel="stylesheet" href="' + inc_path + '/css/slick.css">' +
+'<link rel="stylesheet" href="' + inc_path + '/css/slick-theme.css">'+
+'<link rel="stylesheet" href="' + inc_path + '/css/colorbox.css">' +
+'<link rel="stylesheet" href="' + inc_path + '/css/magnific-popup.css">' ;
+document.write(html_c);

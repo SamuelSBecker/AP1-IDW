@@ -1,0 +1,133 @@
+// JavaScript Document
+var ga_id = "UA-41232473-15";
+
+var html_ga = "<script type='text/javascript'>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');";
+    html_ga += "ga('create', '"+ ga_id +"', 'auto');";
+    html_ga += "ga('require', 'displayfeatures');";
+    html_ga += "ga('require', 'linkid', 'linkid.js');";
+	html_ga += "ga('send', 'pageview');</script>";
+document.write(html_ga);
+
+/*----------------------
+	gdpr / copyright
+----------------------*/
+var setCookieVal = 'cookieAccept';
+// handle
+$(function() {
+	'use strict';
+	//copyright
+	var UsTxt = '<script>var versaTag = {};versaTag.id = "9099";versaTag.sync = 0;versaTag.dispType = "js";versaTag.ptcl = "HTTPS";versaTag.bsUrl = "bs.serving-sys.com/BurstingPipe";versaTag.activityParams = {"Session":""};versaTag.retargetParams = {};versaTag.dynamicRetargetParams = {};versaTag.conditionalParams = {};</script><script id="ebOneTagUrlId" src="https://secure-ds.serving-sys.com/SemiCachedScripts/ebOneTag.js"></script><noscript><iframe src="https://bs.serving-sys.com/BurstingPipe?cn=ot&amp;onetagid=9099&amp;ns=1&amp;activityValues=$$Session=[Session]$$&amp;retargetingValues=$$$$&amp;dynamicRetargetingValues=$$$$&amp;acp=$$$$&amp;"style="display:none;width:0px;height:0px"></iframe></noscript>';
+
+	if(document.URL.match('/us/')){
+		$('body').prepend(UsTxt);
+	}	
+	var copyright = '&copy;CAPCOM CO., LTD. 2018 ALL RIGHTS RESERVED.';
+	$('#title_footer_capcom_copyright').append(copyright);	
+	
+	// gdpr
+	gdpr();
+});
+// Message
+function messageBox() {
+	'use strict';
+	var messageText = [
+	    '<p class="text">The website uses cookies to ensure you get the best experience on our website.<br>',
+	    'Cookies could be managed via your browser setting at any time.<a href="http://www.capcom.co.jp/site/privacy_01english.html" class="privacyPolicy" target="_blank">Learn more</a></p>',
+	    '<div class="linkBox">',
+	    '<div class="btn" id="acceptBtn" ontouchstart>OK</div>',
+	    '</div>'
+	].join('');
+	$('<div>', { id: 'Gdpr', class: 'messageBox' }).appendTo('body');
+	$('#Gdpr').append(messageText).addClass('active');
+}
+// Cookie Clear
+function cookieClear() {
+	// Common
+    var cookies = document.cookie.split('; ');
+    for (var c = 0; c < cookies.length; c++) {
+        var d = window.location.hostname.split('.');
+        while (d.length > 0) {
+            var cookieBase = encodeURIComponent(cookies[c].split(';')[0].split('=')[0]) + '=; expires=Thu, 01-Jan-1970 00:00:01 GMT; domain=' + d.join('.') + ' ;path=';
+            var p = location.pathname.split('/');
+            document.cookie = cookieBase + '/';
+            while (p.length > 0) {
+                document.cookie = cookieBase + p.join('/');
+                p.pop();
+            };
+            d.shift();
+        }
+    }
+    // Original
+    $.cookie(setCookieVal, '', {expires: -1, path: '/' });
+}
+function gdpr() {
+	// var
+	var $select = $('#language'),
+			$selectIb = $('#languageIb'),
+		gdprAccept = $.cookie(setCookieVal);
+	// footer Btn Active
+	$('#gaOptOut').removeClass('disable');
+	// Link button control without Age
+	if($select.hasClass('noAgeGate')) {
+		$select.on('change', function(){
+			var slclang = $(this).find('option:selected').val();
+			if(slclang === 'Ja'){
+				$('#linkBtnPS4').removeClass('noActive').addClass('active').find('a').attr('href','http://www.capcom.co.jp/monsterhunter/world/ps4/');
+				$('#linkBtnPC').removeClass('noActive').addClass('active').find('a').attr('href','http://www.capcom.co.jp/monsterhunter/world/pc/');
+			} else if (slclang === 'select'){
+				$('#linkBtnPS4').removeClass('active').addClass('noActive').find('a').attr('href','javascript:void(0)');
+				$('#linkBtnPC').removeClass('active').addClass('noActive').find('a').attr('href','javascript:void(0)');
+			} else{
+				$('#linkBtnPS4').removeClass('noActive').addClass('active').find('a').attr('href',''+slclang+'/');
+				$('#linkBtnPC').removeClass('noActive').addClass('active').find('a').attr('href','/pc/' + slclang+'/');
+			}
+			//cookie
+			$(document).on('click','.linkBtn.active a',function(){
+				var JaUrl ="//www.capcom.co.jp/monsterhunter/world/";
+				if($(this).attr('href').match(JaUrl)){
+				}else{
+					$.cookie('langSelect', slclang, { expires:9999, path: '/' });					
+				}
+			});			
+		});
+	}
+	if($selectIb.hasClass('noAgeGate')) {
+		$selectIb.on('change', function(){
+			var slclang = $(this).find('option:selected').val();
+			if(slclang === 'Ja'){
+				$('#linkBtnPS4Ib').removeClass('noActive').addClass('active').find('a').attr('href','http://www.capcom.co.jp/monsterhunter/world-iceborne/ps4/');
+				$('#linkBtnPCIb').removeClass('noActive').addClass('active').find('a').attr('href','http://www.capcom.co.jp/monsterhunter/world-iceborne/pc/');
+			} else if (slclang === 'select'){
+				$('#linkBtnPS4Ib').removeClass('active').addClass('noActive').find('a').attr('href','javascript:void(0)');
+				$('#linkBtnPCIb').removeClass('active').addClass('noActive').find('a').attr('href','javascript:void(0)');
+			} else{
+				$('#linkBtnPS4Ib').removeClass('noActive').addClass('active').find('a').attr('href','https://www.monsterhunter.com/world-iceborne/' + slclang+'/');
+				$('#linkBtnPCIb').removeClass('noActive').addClass('active').find('a').attr('href','https://www.monsterhunter.com/world-iceborne/pc/' + slclang+'/');
+			}
+			//cookie
+			$(document).on('click','.linkBtn.active a',function(){
+				var JaUrlIb ="//www.capcom.co.jp/monsterhunter/world-iceborne/";
+				if($(this).attr('href').match(JaUrlIb)){
+				}else{
+					$.cookie('langSelect', slclang, { expires:9999, path: '/' });					
+				}
+			});			
+		});
+	}
+	if(gdprAccept === null) {
+		// messageBox
+		messageBox();
+	} else if(gdprAccept) {
+		// OptIn GA
+		window['ga-disable-'+ga_id+''] = false;
+	}
+	// Accept
+	$(document).on('click', '#Gdpr #acceptBtn', function(){
+		$.cookie(setCookieVal, true, { expires: 9999, path: '/' });
+		$('#Gdpr').removeClass('active').addClass('disable');
+		setTimeout(function() {
+			$('#Gdpr').remove();
+			// setTimeout('window.location.reload(false)', 100);
+		}, 250);
+	});
+}

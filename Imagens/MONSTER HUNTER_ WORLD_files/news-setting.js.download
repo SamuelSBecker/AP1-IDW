@@ -1,0 +1,25 @@
+// 優先的に表示したいツイートのIDを入力
+var pickupID = [
+	"908506748587143168",
+	"908594256909971457"
+];
+
+// カテゴリの表記を入力してください
+var allCategories = [
+	{
+		hash: "MHW_Monster",
+		name: "生態系"
+	},
+	{
+		hash: "MHW_Field",
+		name: "生態系"
+	},
+	{
+		hash: "MHW_Hunt",
+		name: "ハンティング"
+	},
+	{
+		hash: "MHW_PR",
+		name: "関連情報"
+	}
+];

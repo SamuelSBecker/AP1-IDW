@@ -1,0 +1,134 @@
+body{
+    background-color: #181413;
+}
+header{
+    width: 100%;
+    height: 800px;
+}
+.Flex-Box{
+    display: flex; 
+    justify-content: space-between;
+}
+#Bg-Video{
+    right: 0;
+    bottom: 0;
+    top:0;
+    left: 0;
+    width: 1700px;
+    height: 800px;
+    margin: -25px -10px 0px -10px; 
+}
+#Fix-Logo{
+    position: absolute;
+}
+.Center{
+    justify-content: center;
+}
+.News-Position{
+    width: 75%;
+    background-color: #130D0C;
+    margin: 50px 0px 0px 50px;
+}
+.News{
+    width: 100%;
+    font-family: calibri;
+    text-align: Left;
+    color:#CCCCCC;
+    font-size: 150%;
+}
+.Session{
+    text-align: start;
+    width:100px;
+    padding-top: 10px;
+}
+.News-Margin{
+    margin:20px 40px 0px 40px;
+}
+.Pic-News{
+    min-width: 300px;
+    height: 200px;
+    padding: 5px;
+}
+.End{
+    background-color: #000000;
+    margin:50px -10px -100px -10px;
+    justify-content: start;
+}
+.Logo-End{
+    width:300px;
+    height: 220px;
+    margin:50px 50px 10px 50px;
+}
+.line{
+    border:1px solid #444444;
+    height: 330px;
+    margin: 0px 0px 0px 0px;
+}
+#Between{
+    justify-content: start;
+    width: 30%;
+    margin: 50px 0px 50px 20px;
+}
+.Plataformas{
+    width: 100px;
+    height: 20px;
+    margin-right: 5px;
+}
+#Xbox{
+    height: 30px;
+    width: 150px;
+    margin-top: 20px;
+}
+#Capcom{
+    width: 150px;
+    height: 30px;
+    margin: 30px 0px 15px 50px;
+}
+aside{
+    width: 50%;
+}
+.Y-Logo{
+    width: 150px;
+    height: 150px;
+    margin: 20px 5px 20px 0px;
+    border-radius: 50em;
+}
+.Y-Title{
+    font-family: calibri;
+    font-size: 130%;
+    color:#CCCCCC;
+    width: 50%;
+    margin: 10px 10px 10px 10px;
+    padding-left: 10px;
+    padding-top: 10px;   
+}
+.Color{
+    color:#CCCCCC;
+}
+.Colum{
+    background-color: #130D0C;
+    margin:50px 10px 70px 10px
+}
+.S-Title{
+    color:#CFEE1D;
+}
+.Social-Media{
+    width: 90px;
+    height: 70px;
+    margin: -12px 0px 0px -28px;
+}
+#Youtube-Icon{
+    width: 50px;
+    height: 40px;
+    margin: 2px 0px 0px -8px;
+}
+#Twitter-Icon{
+    width: 55px;
+    height: 40px;
+    margin-left: 5px;
+}
+#Face-Icon{
+    width: 50px;
+    height: 40px;
+    margin-left: -10px;
+}

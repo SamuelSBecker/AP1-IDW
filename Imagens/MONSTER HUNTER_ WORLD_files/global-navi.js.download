@@ -1,0 +1,77 @@
+var nav_path = inc_path;
+var sp_path = document.URL.indexOf("/sp/") != -1 ? "sp/" : "";
+var html_c =
+'<div class="btn-utility">' +
+	'<div class="Global" id="GlobalHead">' +
+		'<div class="dropDown dpPC" id="dropDownHead"></div>' +
+	'</div>' +
+	'<div class="sound">' +
+		'<span>SOUND</span>' +
+	'</div>' +
+'</div>' +
+'<div class="btn-navi">' +
+  '<a class="menu-trigger" href="">' +
+    '<span class="title">MENU</span>' +
+    '<span class="border border01"></span>' + 
+    '<span class="border border02"></span>' +
+  '</a>' +
+'</div>' +
+'<nav id="global-navi">' +
+'<div class="global-navi-wrapper">' +
+'<div class="global-navi-inner">' +
+'<ul>' + 
+'<li><a href="' + nav_path + '/us/' + sp_path + '" class="page-link">HOME</a></li>' + 
+'</ul>' + 
+'</div>' + 
+'<div class="global-navi-inner">' +
+'<ul>' + 
+'<li><a href="' + nav_path + '/us/' + sp_path + '#media" class="page-link">TRAILERS</a></p></li><li>' + 
+'</ul>' + 
+'</div>' + 
+'<div class="global-navi-inner">' +
+'<ul>' + 
+'<li><a href="' + nav_path + '/us/' + sp_path + '#introduction" class="page-link">INTRODUCTION</a></li>' + 
+'<li class=""><a href="' + nav_path + '/us/' + sp_path + '#ecosystem" class="page-link">ECOSYSTEM</a>' + 
+'<ul class="globa-sub-navi">' + 
+'<li class="sub-navi-menu"><a href="' + nav_path + '/us/' + sp_path + 'ecosystem/01.php" class="page-link">Ancient Forest</a></li>' + 
+'<li class="sub-navi-menu"><a href="' + nav_path + '/us/' + sp_path + 'ecosystem/02.php" class="page-link">Wildspire Waste</a></li>' + 
+'<li class="sub-navi-menu"><a href="' + nav_path + '/us/' + sp_path + 'ecosystem/03.php" class="page-link">Coral Highlands</a></li>' +
+'<li class="sub-navi-menu"><a href="' + nav_path + '/us/' + sp_path + 'ecosystem/04.php" class="page-link">Rotten Vale</a></li>' +
+'<li class="sub-navi-menu"><a href="' + nav_path + '/us/' + sp_path + 'ecosystem/05.php" class="page-link">Elder&#39;s Recess</a></li>' +
+'</ul>' + 
+'</li>' + 
+'<li><a href="' + nav_path + '/us/' + sp_path + '#hunting" class="page-link">HUNTING</a>' + 
+'<ul class="globa-sub-navi">' + 
+'<li class="sub-navi-menu"><a href="' + nav_path + '/us/' + sp_path + 'hunting/01.php" class="page-link">The Hunter&#39;s Arsenal</a></li>' + 
+'<li class="sub-navi-menu"><a href="' + nav_path + '/us/' + sp_path + 'hunting/02.php" class="page-link">Scoutflies</a></li>' + 
+'<li class="sub-navi-menu"><a href="' + nav_path + '/us/' + sp_path + 'hunting/03.php" class="page-link">Slinger</a></li>' + 
+'<li class="sub-navi-menu"><a href="' + nav_path + '/us/' + sp_path + 'hunting/04.php" class="page-link">Specialized Tools</a></li>' + 
+'<li class="sub-navi-menu"><a href="' + nav_path + '/us/' + sp_path + 'hunting/05.php" class="page-link">Palicoes</a></li>' + 
+'</ul>' + 
+'</li>' + 
+'<li class=""><a href="' + nav_path + '/us/' + sp_path + '#base" class="page-link">RESEARCH COMMISSION HQ</a>' + 
+'<ul class="globa-sub-navi">' + 
+'<li class="sub-navi-menu"><a href="' + nav_path + '/us/' + sp_path + 'base/01.php" class="page-link">Major Characters</a></li>' + 
+'<li class="sub-navi-menu"><a href="' + nav_path + '/us/' + sp_path + 'base/02.php" class="page-link">The Smithy</a></li>' + 
+'<li class="sub-navi-menu"><a href="' + nav_path + '/us/' + sp_path + 'base/03.php" class="page-link">The Canteen</a></li>' + 
+'<li class="sub-navi-menu"><a href="' + nav_path + '/us/' + sp_path + 'base/04.php" class="page-link">The Gathering Hub</a></li>' + 
+'</ul>' + 
+'</li>' + 
+'</div>' + 
+'</ul>' + 
+'<div class="global-navi-inner">' +
+'<ul>' + 
+'<li><a href="' + nav_path + '/us/collabo/" class="page-link no-barba">COLLABORATION</a></li>' + 
+'<li><a href="//game.capcom.com/world/us/schedule.html" class="page-link no-barba">EVENT QUEST SCHEDULE</a></li>' + 
+'</ul>' + 
+'</div>' + 
+'<div class="global-navi-inner">' +
+'<ul>' + 
+'<li><a href="' + nav_path + '/us/' + sp_path + '#products" class="page-link">PRODUCTS</a></li>' + 
+'</ul>' + 
+'</div>' + 
+'</div>' + 
+'</nav>' + 
+'<div class="bgm" data-bgm=["' + nav_path + '/audio/bgm/bgm001.mp3"] style="display: none;"></div>' + 
+'<div id="loading" class="first-loading show"><div class="loading-inner"></div><div class="bg-loading"></div></div>';
+document.write(html_c);

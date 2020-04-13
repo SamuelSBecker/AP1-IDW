@@ -1,0 +1,42 @@
+var settingBgVideoID = {
+	"top": {
+		"top": ["SSZV5ma5PvQ", "YtFpRL3yL0s", "vjKDMC6ppBk"]
+	},
+	"ecosystem": {
+		"01": ["JBhipr7mAJQ"],
+		"01_01": ["5uqKFiewFUg"],
+		"01_02": ["D4MZI0vGl9E"],
+		"01_03": ["sGMkTGC-8eU"],
+		"01_04": ["DepWnA9t23M"],
+		"01_05": ["RFobco1pKII"],
+		"02": ["R-s3qHEKbJc"],
+		"02_01": ["b_lRyf0vyYo"],
+		"02_02": ["cPjL_HIT_qU"],
+		"02_03": ["D_lQ8Ck08uU"],
+		"02_04": ["H_0M-jcvuR0"],
+		"02_05": ["W80DNGYCQWo"],
+		"03": ["BhtCacIwlhI"],
+		"03_01": ["Z2N8gOCahIc"],
+		"03_02": ["vfU_ZNum8jk"],
+		"03_03": ["hefrEL4WO7A"],
+		"04": ["WqweP1Oq79o"],
+		"04_01": ["jME4F4pE_LE"],
+		"04_02": ["ub8HYGRBcAs"],
+		"04_03": ["DuAep1drqbU"],
+		"04_04": ["Jm0OUG6hxq8"],
+		"05": ["aKr0w8me1rA"],
+		"05_01": ["ZbQPmgwzZcc"],
+		"05_02": ["CpUKv98ureQ"],
+		"05_03": ["ShLFco1AFmM"],
+		"05_04": ["suwlKMLADZM"],
+	},
+	"hunting": {
+		"02": ["BkE89V87mtI"],
+		"03": ["Kdio7XknJK8"],
+		"04": ["1ShHg5K0zMU"],
+		"05": ["mA-OuHnt5II"],
+	},
+	"base": {
+		"04": ["PiT22jdlcaM"]
+	}
+};

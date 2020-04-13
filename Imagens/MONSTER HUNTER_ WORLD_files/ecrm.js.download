@@ -1,0 +1,15 @@
+$(function() {
+	'use strict';
+	// open
+	$('#eCRM').on('click', function(){
+		$('html,body,#eCrmModal,.modalOpenState').addClass('eCrmActive');
+        $('.eCrmIframe').attr('src',iframeUrl);
+		return false;
+	});
+	// close
+	$('#modalOverlay,#modalClose').on('click', function(){
+		$('html,body,#eCrmModal,.modalOpenState').removeClass('eCrmActive');
+		$('.eCrmIframe').attr('src','');
+		return false;
+	});
+});

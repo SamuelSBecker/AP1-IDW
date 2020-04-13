@@ -1,0 +1,70 @@
+$.fn.textShortCut = function(opt){
+	var self = this;
+    var defaults = {
+        cutText: '...',
+        resize: true
+    };
+
+    var settings = $.extend(defaults, opt);
+    self.originLength = 0;
+    self.resize = settings.resize;
+    self.cutText = settings.cutText;
+    self.shortCutTimer;
+    self.origin = [];
+
+	self.getShortCutLoop = function() {
+		var length = $(document).find(self).length;
+	    for(var i = self.originLength; i < length; i++) {
+	    	if(!self.origin[i]) {
+	    		self.origin[i] = $(document).find(self).eq(i).clone();
+	    		self.originLength++;
+	    	}
+	    }
+	    $(window).trigger("resize");
+	}
+	self.textShortCut = function() {
+		var length = $(document).find(self).length;
+		if(length > 0) {
+			for(var i = 0; i < length; i++) {
+				if(self.origin[i]) {
+					var $target = $(document).find(self).eq(i);
+					var html = self.origin[i].html();
+					var $clone = self.origin[i].clone();
+
+					$clone.css({
+						display: 'none',
+						position : 'absolute',
+						overflow : 'visible'
+					})
+					.width($target.width())
+					.height('auto');
+
+					$target.after($clone);
+					while((html.length > 0) && ($clone.height() > $target.height())) {
+						html = html.substr(0, html.length - 1);
+						$clone.html(html + self.cutText);
+					}
+
+					$target.html($clone.html());
+					$clone.remove();
+				}
+			}
+		}
+	}
+	self.destroyShortCut = function() {
+		self.originLength = 0;
+		self.origin = [];
+		$(window).off();
+	}
+	if(self.resize) {
+		$(window).on("resize", function(){
+			clearTimeout(self.shortCutTimer);
+		    self.shortCutTimer = setTimeout( function(){ self.textShortCut(); }, 250);
+		});
+	}
+	else {
+		self.shortCutTimer = setTimeout( function(){ self.textShortCut(); }, 250);
+	}
+	self.getShortCutLoop();
+	return self;
+};

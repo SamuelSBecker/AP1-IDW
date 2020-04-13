@@ -1,0 +1,31 @@
+var html_c =
+'<script src="' + inc_path + '/js/libs/jquery-1.11.3.min.js"></script>' +
+'<script src="' + inc_path + '/js/libs/velocity.min.js"></script>' +
+'<script src="' + inc_path + '/js/libs/TweenMax.min.js"></script>' +
+'<script src="' + inc_path + '/js/libs/jquery.cookie.js"></script>' +
+'<script src="' + inc_path + '/js/libs/ScrollToPlugin.min.js"></script>' +
+'<script src="' + inc_path + '/js/slick.min.js"></script>' +
+'<script src="' + inc_path + '/js/libs/jquery.colorbox-min.js"></script>' +
+'<script src="' + inc_path + '/js/libs/jquery.magnific-popup.min.js"></script>' +
+'<script src="' + inc_path + '/js/libs/jquery.rollover.js"></script>' + 
+'<script src="' + inc_path + '/js/libs/jquery.mb.YTPlayer.js"></script>' +
+'<script src="' + inc_path + '/js/libs/SoundControl.js"></script>' +
+'<script src="' + inc_path + '/js/libs/barba.js"></script>' +
+'<script src="' + inc_path + '/js/shared.js"></script>' +
+'<script src="' + inc_path + '/js/libs/TextShortCut.js"></script>' +
+'<script src="' + inc_path + '/js/news-setting.js"></script>' +
+'<script src="' + inc_path + '/js/bg-video-id.js"></script>' ;
+document.write(html_c);
+
+//
+//$(document).on('ready',function(){
+//			if(document.URL.match('_non/')){
+//				// URLに_non/が含まれる時に実行する処理を記述する
+//				$.getScript('/js/shared_non.js');
+//			}else{
+//				// 上記の場合以外の時に行う処理を記述する
+//				$.getScript('/js/shared.js');
+//			}
+//	});
+//
+

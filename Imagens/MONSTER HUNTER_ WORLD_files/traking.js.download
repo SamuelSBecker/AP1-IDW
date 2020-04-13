@@ -1,0 +1,49 @@
+// Traking
+var
+// Youtube Remarketing
+rcTrakingHtml = '<script>/* <![CDATA[ */';
+rcTrakingHtml += 'var google_conversion_id = 850208075;';
+rcTrakingHtml += 'var google_custom_params = window.google_tag_params;';
+rcTrakingHtml += 'var google_remarketing_only = true;';
+rcTrakingHtml += '/* ]]> */</script>';
+rcTrakingHtml += '<div style="display:none;"><script src="//www.googleadservices.com/pagead/conversion.js"></script></div>';
+rcTrakingHtml += '<noscript>';
+rcTrakingHtml += '<div style="display:inline;"><img height="1" width="1" style="border-style:none;" alt="" src="//googleads.g.doubleclick.net/pagead/viewthroughconversion/850208075/?guid=ON&amp;script=0"/></div>';
+rcTrakingHtml += '</noscript>';
+// Youtube Conversion
+rcTrakingHtml += '<script>/* <![CDATA[ */';
+rcTrakingHtml += 'var google_conversion_id = 850208075;';
+rcTrakingHtml += 'var google_conversion_language = "en";';
+rcTrakingHtml += 'var google_conversion_format = "3";';
+rcTrakingHtml += 'var google_conversion_color = "ffffff";';
+rcTrakingHtml += 'var google_conversion_label = "VnMjCKmM3nEQy8q0lQM";';
+rcTrakingHtml += 'var google_remarketing_only = false;';
+rcTrakingHtml += '/* ]]> */</script>';
+rcTrakingHtml += '<div style="display:none;"><script src="//www.googleadservices.com/pagead/conversion.js"></script></div>';
+rcTrakingHtml += '<noscript>';
+rcTrakingHtml += '<div style="display:inline;"><img height="1" width="1" style="border-style:none;" alt="" src="//www.googleadservices.com/pagead/conversion/850208075/?label=VnMjCKmM3nEQy8q0lQM&amp;guid=ON&amp;script=0"/></div>';
+rcTrakingHtml += '</noscript>';
+// Google Search Remarketing
+rcTrakingHtml += '<script>/* <![CDATA[ */';
+rcTrakingHtml += 'var google_conversion_id = 850181415;';
+rcTrakingHtml += 'var google_custom_params = window.google_tag_params;';
+rcTrakingHtml += 'var google_remarketing_only = true;';
+rcTrakingHtml += '/* ]]> */</script>';
+rcTrakingHtml += '<div style="display:none;"><script src="//www.googleadservices.com/pagead/conversion.js"></script></div>';
+rcTrakingHtml += '<noscript>';
+rcTrakingHtml += '<div style="display:inline;"><img height="1" width="1" style="border-style:none;" alt="" src="//googleads.g.doubleclick.net/pagead/viewthroughconversion/850181415/?guid=ON&amp;script=0"/></div>';
+rcTrakingHtml += '</noscript>';
+// Google Search Conversion
+rcTrakingHtml += '<script>/* <![CDATA[ */';
+rcTrakingHtml += 'var google_conversion_id = 850181415;';
+rcTrakingHtml += 'var google_conversion_language = "en";';
+rcTrakingHtml += 'var google_conversion_format = "3";';
+rcTrakingHtml += 'var google_conversion_color = "ffffff";';
+rcTrakingHtml += 'var google_conversion_label = "z_jOCJLy3XEQp_qylQM";';
+rcTrakingHtml += 'var google_remarketing_only = false;';
+rcTrakingHtml += '/* ]]> */</script>';
+rcTrakingHtml += '<div style="display:none;"><script src="//www.googleadservices.com/pagead/conversion.js"></script></div>';
+rcTrakingHtml += '<noscript>';
+rcTrakingHtml += '<div style="display:inline;"><img height="1" width="1" style="border-style:none;" alt="" src="//www.googleadservices.com/pagead/conversion/850181415/?label=z_jOCJLy3XEQp_qylQM&amp;guid=ON&amp;script=0"/></div>';
+rcTrakingHtml += '</noscript>';
+document.write(rcTrakingHtml);

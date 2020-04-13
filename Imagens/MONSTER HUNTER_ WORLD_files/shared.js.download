@@ -1,0 +1,984 @@
+$(function(){
+	$(window).on("load", function(){
+		var soundObj;
+		var isPageChanging = true;
+		var videoPlayTimer;
+		var isEnableScroll = false;
+		var scrollTween;
+
+		var $gNavi = $("#global-navi");
+		var $gNaviMenu = $gNavi.find(".global-navi-inner > ul > li");
+		var $gNaviObj = $gNavi.find(".global-navi-inner > ul > li");
+		var $btnNavi = $(".btn-navi");
+		var $menuTrigger = $(".menu-trigger");
+
+		var $btnLang = $(".btn-languarge");
+		var $listLang = $(".list-languarge");
+
+		var $loading = $("#loading");
+
+		var GNAVI_DELAY_BASE = 400;
+		var GNAVI_DELAY = 50;
+		var INNER_PAGE_VOLUME = 0.2;
+
+		var catScroll = 0;
+		var catIndex = -1;
+		var firstSend = true;
+		var newsShortCut;
+
+		setTimeout(function(){
+			$loading.removeClass("first-loading");
+		}, 600);
+
+		var bodyID = $("body").attr("id");
+		var oldBodyID = bodyID;
+
+		InitVideoID();
+	  	pageInit();
+
+	  	var $target = $(".global-navi-inner > ul > li, .global-navi-inner > p");
+	  	var length = $target.length;
+	  	for(var i = 0; i < length; i++) {
+	  		var delay = GNAVI_DELAY_BASE + (i * GNAVI_DELAY) + "ms";
+	  		$target.eq(i).css({
+	  			"-webkit-transition-delay": delay,
+	  			"transition-delay": delay
+	  		});
+	  	}
+
+	  	var originalFn = Barba.Pjax.Dom.parseResponse;
+		Barba.Pjax.Dom.parseResponse = function(response) {
+			var html = arguments[0];
+			var text = /videoURL/g;
+			var url = window.location.href;
+			var index = html.indexOf('body id="') + 9;
+			var start = html.slice(index);
+			var endIndex = start.indexOf('"');
+			var nextID = start.slice(0, endIndex);
+		  	if(nextID == "index.php") nextID = "top";
+		  	if(nextID != "news") {
+		  		var filename = nextID == "top" ? "top" : url.match(".+/(.+?)\.[a-z]+([\?#;].*)?$")[1];
+	  			if(settingBgVideoID[nextID]) {
+	  				if(settingBgVideoID[nextID][filename]) {
+						var cnt = 0;
+						html = arguments[0];
+						while (result = text.exec(html)) {
+							var index = result.index + 21;
+							var start = html.slice(index)
+							var endIndex = start.indexOf("'");
+							var videoID = start.slice(0, endIndex);
+							var targetID = settingBgVideoID[nextID][filename][cnt];
+							if(targetID) {
+								arguments[0] = arguments[0].replace("videoURL:'//youtu.be/" + videoID, "videoURL:'//youtu.be/" + targetID);
+							}
+							cnt++;
+						}
+					}
+				}
+			}
+			return originalFn.apply(Barba.Pjax.Dom, arguments);
+		};
+
+		Barba.Pjax.originalPreventCheck = Barba.Pjax.preventCheck;
+		Barba.Pjax.preventCheck = function(evt, element) {
+			if (!$(element).hasClass("page-link")) {
+		      return false;
+		    }
+		    else {
+				if ($(element).attr('href') && $(element).attr('href').indexOf('#') > -1) return true;
+				if($(element).get(0)) {
+				    if($(element).get(0).href == location.href) {
+				    	evt.preventDefault();
+				    	closeGNavi();
+				    	return false;
+				    }
+				}
+				if (!Barba.Pjax.originalPreventCheck(evt, element)) {
+			      return false;
+			    }
+			    else if ($(element).parent().find("ul").length > 0 && $(element).parent().hasClass("sub-navi-open")) {
+			      return false;
+			    };
+			    if(!$(element).parent().parent().hasClass("globa-sub-navi") && $(element).closest("#global-navi").length > 0 && bodyID == "top" && $(element).attr("href").indexOf("news") == -1 && $(element).attr("href").indexOf("eventquest") == -1 && $(element).attr("href").indexOf("schedule") == -1 && $(element).attr("href").indexOf("collabo") == -1) {
+			    	return false;
+			    }
+			}
+		    return true;
+		};
+
+		Barba.Pjax.start();
+		Barba.Dispatcher.on('transitionCompleted', function(currentStatus, oldStatus, container) {
+			var matchUrl = currentStatus.url.split("/");
+			var matchIndex = document.URL.indexOf("/web_dvp/") != -1 ? 7 : 4;
+	  		bodyID = (matchUrl !== null && matchUrl[matchIndex] !== "") ? matchUrl[matchIndex] : 'top';
+	  		if(bodyID == "index.php") bodyID = "top";
+			$("body").attr('id', bodyID);
+
+	  		if(oldBodyID != "ecosystem" ||  bodyID != "ecosystem") {
+	  			catScroll = 0;
+	  			catIndex = -1;
+	  		}
+
+			setTimeout(function(){
+				pageInit();
+	  		}, 300);
+		});
+
+		$(document).on("click", ".tab-btn", function(event) {
+		      event.preventDefault();
+		      
+		      // クリック対象が既に開いている場合は何もしない
+		      if ($(this).hasClass("active")) return;
+		      
+		      // 既に開いてるものは閉じる
+		      $(document).find(".tab.active .tab-area.active").removeClass("active");
+		      $(document).find(".tab.active .tab-btn.active").removeClass("active");
+		      
+		      // 対象を開く
+		      var index = $(document).find(".tab.active .tab-btn").index($(this));
+		      $(this).addClass("active");
+		      $(document).find(".tab.active .tab-area:eq(" + index + ")").addClass("active");
+		});
+
+		$(document).on("click", ".select-tab li", function(event) {
+			event.preventDefault();
+
+			// クリック対象が既に開いている場合は何もしない
+			if ($(this).hasClass("active")) return;
+
+			// 既に開いてるものは閉じる
+			$(document).find(".tab.active").removeClass("active");
+			$(document).find(".select-tab li.active").removeClass("active");
+
+			// 対象を開く
+			var index = $(document).find(".select-tab li").index($(this));
+			$(this).addClass("active");
+			$(document).find(".tab:eq(" + index + ")").addClass("active");
+		});
+		
+		$(document).bind('cbox_open', function(){
+			hideNavBtn();
+			pauseBgVideo();
+			if($("body").hasClass("cbox-open-video")) {
+				if(soundObj && !soundObj.isBgmPause) {
+					soundObj.changeBgmVolume(0, 800, 0, true);
+				}
+			}
+		});
+		$(document).bind('cbox_closed', function(){
+			showNavBtn();
+			playBgVideo();
+			if($("body").hasClass("cbox-open-video")) {
+				$("body").addClass("cbox-open-video").removeClass("cbox-open-video");
+				if(soundObj && !soundObj.isBgmPause) {
+					soundObj.changeBgmVolume(soundObj.bgmVolume, 800, 0, false);
+				}
+			}
+		});
+
+	  	$(document).on("click", ".video-list p", function(){
+			if($(this).hasClass("video-current")) return false;
+			var targetID = $(this).data("video-id");
+			var $youtubeContainer = $(this).closest(".youtube-container");
+			var $parent = $(this).closest(".video-list");
+			var $target = $youtubeContainer.find(".bg-video");
+
+			$parent.find("p").removeClass("video-current");
+			$(this).addClass("video-current");
+			$target.YTPChangeMovie({ videoURL: 'http://youtu.be/' + targetID });
+		});
+
+		$(document).on("click", "a[href^='#']", function(e){
+			e.preventDefault();
+			topHashScroll($(this));
+		});
+
+		$(".global-navi-inner > ul > li").hover(function(e){
+			if($(this).find(".globa-sub-navi").length > 0) {
+				$(this).find(".globa-sub-navi").stop().slideDown(400);
+			}
+		}, function(){
+			if($(this).find(".globa-sub-navi").length > 0) {
+				$(this).find(".globa-sub-navi").stop().slideUp(180);
+			}
+		});
+
+		$(".global-navi-inner > ul > li > a").on("click", function(e){
+			if(bodyID == "top" && $(this).attr("href").indexOf("news") == -1 && $(this).attr("href").indexOf("eventquest") == -1 && $(this).attr("href").indexOf("schedule") == -1 && $(this).attr("href").indexOf("collabo") == -1) {
+				e.preventDefault();
+				var $navParent = $(this).closest(".global-navi-inner");
+				if($(document).find(".global-navi-inner").index($navParent) == 0) {
+					closeGNavi();
+					setTimeout(function(){
+						history.replaceState('', document.title, window.location.pathname);
+					}, 300);
+				}
+				else {
+					topHashScroll($(this));
+				}
+			}
+		});
+		$(".global-navi-inner > ul > li > ul > li a").on("click", function(e){
+			$(".slider-item").slick("slickGoTo", 0, true);
+			catIndex = -1;
+			scrollTween = TweenMax.to(window, 0, {
+				scrollTo: 0
+			});
+		});
+		$(document).on("click", "#ecosystem .sub-contents-inner a", function(e){
+			setTimeout(function(){
+				$(".slider-item").slick("slickGoTo", 0, true);
+			}, 300);
+			catIndex = -1;
+			setTimeout(function(){
+				catScroll = 0;
+				scrollTween = TweenMax.to(window, 0, {
+					scrollTo: 0,
+				});
+			}, 500);
+		});
+
+		$("#global-navi").on("click", function(e){
+			if($(e.target).closest(".global-navi-wrapper").length == 0) {
+				closeGNavi();
+			}
+		});
+
+		$(".sound").on("click", function(){
+			if(soundObj) {
+				if(!soundObj.isBgmPause) {
+					soundObj.changeBgmVolume(0, 800, 0, true, function(){
+						soundObj.isBgmPause = true;
+							if(document.URL.match('_non/')){
+							}else{
+								$.cookie("IS_PAUSE", "true", {expires: 9999, path: '/'});
+							}						
+					});
+					$(document).find(".bg-video").each(function(){
+						if(bodyID != "top" && $(this).YTPGetPlayer()) $(this).YTPSetVolume(0);
+					});
+					$(".sound").removeClass("on");
+				}
+				else {
+					soundObj.setBgmPosition(0);
+					soundObj.bgmPlay();
+					soundObj.isBgmPause = false;
+						if(document.URL.match('_non/')){
+						}else{
+							$.cookie("IS_PAUSE", "false", {expires: 9999, path: '/'});
+						}					
+					var vol = bodyID == "top" ? 1 : INNER_PAGE_VOLUME;
+					soundObj.changeBgmVolume(vol, 800, 0, false, function(){
+					});
+					$(document).find(".bg-video").each(function(){
+						if(bodyID != "top" && $(this).YTPGetPlayer()) $(this).YTPSetVolume(100);
+					});
+					$(".sound").addClass("on");
+				}
+			}
+		});
+		$btnNavi.on("click", function(e){
+			e.preventDefault();
+			if($btnNavi.hasClass("open")) {
+				closeGNavi();
+			}
+			else {
+				$menuTrigger.addClass("active");
+				$btnNavi.addClass("open");
+				$gNavi.addClass("show").removeClass("hide");
+			}
+		});
+
+	  	try {
+			document.addEventListener("wheel", wheelEvent, false);
+	    } catch (e) {
+			document.attachEvent("wheel", wheelEvent);
+	    }
+
+	    function wheelEvent(e) {
+	    	if(!isEnableScroll) {
+			    e.preventDefault();
+			}
+		}
+		function showNavBtn() {
+			$btnNavi.removeClass("none");
+		}
+		function hideNavBtn() {
+			$btnNavi.addClass("none");
+		}
+		function InitVideoID() {
+	    	var url = window.location.href;
+			var length = $(".bg-video").length;
+			var text = /videoURL/g;
+			var nextID = bodyID;
+			if(nextID != "news") {
+				if(nextID == "index.php") nextID = "top";
+		  		var filename = nextID == "top" ? "top" : url.match(".+/(.+?)\.[a-z]+([\?#;].*)?$")[1];
+				for(var i = 0; i < length; i++) {
+					var property = $(".bg-video").eq(i).attr("data-property");
+					var cnt = i;
+					while (result = text.exec(property)) {
+						var index = result.index + 21;
+						var start = property.slice(index)
+						var endIndex = start.indexOf("'");					
+						var videoID = start.slice(0, endIndex);
+						var targetID = settingBgVideoID[nextID][filename][cnt];
+						if(targetID) {
+							property = property.replace("videoURL:'//youtu.be/" + videoID, "videoURL:'//youtu.be/" + targetID);
+						}
+					}
+					$(".bg-video").eq(i).attr({
+						"data-property": property
+					});
+				}
+			}
+	  	}
+		function topHashScroll($target) {
+			var link = $target.attr("href");
+			var index = link.indexOf("#");
+			var hash = link.slice(index);
+			if($(hash).length > 0) {
+				closeGNavi();
+				startAutoScroll($(hash), 0.5);
+			}
+		}
+		function startAutoScroll($target, delay) {
+			isEnableScroll = false;
+			setTimeout(function(){
+				history.replaceState('', document.title, window.location.pathname);
+			}, 300);
+			scrollTween = TweenMax.to(window, 0.5, {
+				scrollTo: $target.offset().top,
+				delay: delay,
+				onComplete: function(){
+					isEnableScroll = true;
+				}
+			});
+		}
+		function closeGNavi() {
+			$menuTrigger.removeClass("active");
+			$(".sub-navi-open").removeClass("sub-navi-open");
+			$(".globa-sub-navi").slideUp(300);
+			$btnNavi.removeClass("open");
+			$gNavi.removeClass("show").addClass("hide");
+		}
+		function beforeChange() {
+			$loading.addClass("show");
+			isPageChanging = true;
+			clearInterval(videoPlayTimer);
+			
+			var $bgVideo = $(".bg-video");
+			var length = $bgVideo.length;
+			for(var i = 0; i < length; i++) {
+				$bgVideo.eq(i).playerDestroy();
+			}
+			if(bodyID == "top") {
+	  			if(soundObj && !soundObj.isBgmPause) {
+		  			soundObj.changeBgmVolume(INNER_PAGE_VOLUME, 1200, 0);
+		  		}
+	  		}
+	  		else if(bodyID === "ecosystem") {
+	  			catIndex = $(".slider-item").slick("getSlick").currentSlide;
+	  		}
+
+	  		oldBodyID = bodyID;
+	  		catScroll = $(window).scrollTop();
+	  		$("body").addClass("page-hide");
+	  		if($gNavi.hasClass("show")) closeGNavi();
+			isEnableScroll = false;
+		}
+		function pageInit() {
+			if(document.URL.indexOf("/web_dvp/") != -1) {
+				$(document).find("a").each(function(){
+					var link = $(this).attr("href");
+					if(link.slice(0, 1) == "/" && link.slice(0, 2) != "//" && link.indexOf("/web_dvp/") == -1)  {
+						link = link.replace(/\//, "/web_dvp/original-domain/monsterhunterworld/");
+						$(this).attr({ "href" : link });
+					}
+		  		});
+			}
+
+			if(!firstSend) {
+				if(document.URL.match('_non/')){
+				}else{
+					ga('send', 'pageview', { 'page': location.pathname });
+				}				
+			}
+			firstSend = false;
+
+			$loading.removeClass("show");
+			scrollTween = TweenMax.to(window, 0, {
+				scrollTo: catScroll,
+				delay: 0.1,
+				onComplete: function(){
+					isEnableScroll = true;
+				}
+			});
+			if(!soundObj) {
+				if(document.URL.match('_non/')){
+				}else{
+					var pause = $.cookie("IS_PAUSE") ? $.cookie("IS_PAUSE") : true;
+				}				
+				if(pause == "true") pause = true;
+				if(pause == "false") pause = false;
+
+				if(pause) $(".sound").removeClass("on");
+				else $(".sound").addClass("on");
+
+				soundObj = new SOUND_CONTROL({
+					isBgmControl: true,
+					bgmLoopType: "all",
+					isBgmPause: pause
+				});
+
+				if(bodyID != "top" && !soundObj.isBgmPause) soundObj.changeBgmVolume(INNER_PAGE_VOLUME, 1200, 0);
+			}
+			if(bodyID === "top") {
+				if(soundObj && !soundObj.isBgmPause) {
+		  			soundObj.changeBgmVolume(1, 2000, 0);
+				}
+				$.ajax({
+				  url: "news.json",
+				  cache: false,
+				  type: "GET",
+				  dataType: "json",
+				  timeout: 10000
+				}).done(function (data) {
+					var $newsItem = $(".news-item");
+					for(var i = 0; i < data.length; i++) {
+						var appendHtml = "";
+						if(location.pathname.indexOf("/hk/") != -1) {
+							if(data[i].urls.length > 0) {
+								var target = data[i].urls.indexOf("//") != -1 ? "_target" : "_self";
+								appendHtml = '<div class="news-item-container">' + 
+									'<a href="' + data[i].urls + '" target="' + target + '">' + 
+										'<p class="left-block thumb" style="background-image: url(' + data[i].mediaUrl + ');"></p>' + 
+										'<p class="tit">' + data[i].title + '</p>' + 
+									'</a>' + 
+								'</div>';
+							}
+							else {
+								appendHtml = '<div class="news-item-container">' + 
+									'<p class="left-block thumb" style="background-image: url(' + data[i].mediaUrl + ');"></p>' + 
+									'<dl class="detail">' + 
+										'<dt>' + data[i].title + '</dt>' + 
+										'<dd>' + data[i].text + '</dd>' + 
+									'</dl>' + 
+								'</div>';
+							}
+						}
+						else {
+							var linkStart = "";
+							var linkClose = "";
+							if(data[i].urls.length > 0) {
+								var target = data[i].urls.indexOf("//") != -1 ? "_target" : "_self";
+								linkStart = '<a href="' + data[i].urls + '" target="' + target + '">';
+								linkClose = "</a>";
+							}
+							appendHtml = '<div class="news-item-container">' + 
+								linkStart + 
+									'<p class="left-block thumb" style="background-image: url(' + data[i].mediaUrl + ');"></p>' + 
+									'<p class="tit">' + data[i].title + '</p>' + 
+								linkClose + 
+							'</div>';
+						}
+						$newsItem.append(appendHtml);
+					}
+					if(data.length == 1) $('.news-item').removeClass("news-item-slide").addClass("news-item-single");
+					if(data.length == 2) $('.news-item').removeClass("news-item-single");
+					if(data.length >= 3) {
+						$('.news-item').removeClass("news-item-single").addClass("news-item-slide");
+						$('.news-item').on("init", function(){
+					  		if(newsShortCut) {
+								newsShortCut.destroyShortCut();
+								newsShortCut = null;
+							}
+						  	newsShortCut = $(document).find(".tit").textShortCut({
+						  		resize: false
+						  	});
+					  	});
+						$('.news-item').slick({
+							dots: true,
+							infinite: true,
+							slidesToShow: 2,
+							slidesToScroll: 1,
+							variableWidth: true,
+							touchMove: false
+						});
+					}
+					else {
+						if(newsShortCut) {
+							newsShortCut.destroyShortCut();
+							newsShortCut = null;
+						}
+					  	newsShortCut = $(document).find(".tit").textShortCut({
+					  		resize: false
+					  	});
+					}
+					
+				});
+				
+//
+				$.ajax({
+								url: "topPickup.json",
+								cache: false,
+								type: "GET",
+								dataType: "json",
+								timeout: 10000
+							})
+							.done(function (data) {
+								var length = data.length;
+								var count = 0;
+								for (var i = 0; i < length; i++) {
+												var title = data[i].title;
+												var urls = data[i].urls;
+												var mediaUrl = data[i].mediaUrl;
+												var target = data[i].target;
+												var cCount = data[i].cCount;
+												var upClass = "";
+													if(data[i].upClass === true) {
+														upClass = "up";
+													}
+
+												var topPickup = '<li class="btn-main '+ upClass +'">'+
+																		'<div><img src="'+ mediaUrl +'"></div>'+
+																		 '<p><a href="'+ urls +'" target="'+ target +'" onclick="'+ cCount +'"><span>'+ title +'</span></a></p>'+
+																			'</li>';
+
+										if(data[i].urls.length > 0) {
+													$("#top .main .pickup-list.list-btn").append(topPickup);
+													count++;
+											}
+
+								}
+							});
+					//
+				$('.media-item').on('init', function(){
+					readyPopupVideo();
+				});
+				$('.media-item').slick({
+					dots: true,
+					infinite: true,
+					slidesToShow: 2,
+					slidesToScroll: 1,
+					variableWidth: true,
+					touchMove: false
+				});
+				$(".popup").colorbox({className:"product-item", scrolling:false, iframe:true, innerWidth:1086, innerHeight:870, opacity: 1,});
+				createLangBtn();
+				if(location.hash.length > 0) {
+					setTimeout(function(){
+						scrollTween.kill();
+						startAutoScroll($(location.hash), 0);
+					}, 1000);
+				}
+				setTimeout(function(){
+					history.replaceState('', document.title, window.location.pathname);
+				}, 3000);
+			}
+			else {
+				//190510 footer
+				var pageLink = location.href.split('/')[5];
+				var pageLang = location.href.split('/')[3];
+				var toIB_text ="";
+				var toIB_site ="";
+				switch(pageLang){
+					case 'cn' : toIB_site =  '《Monster Hunter World: Iceborne》官方网站';
+					break;
+					case 'de' : toIB_site =  'Monster Hunter World: Iceborne Offizielle Website';
+					break;
+					case 'es' : toIB_site =  'Sitio web oficial de Monster Hunter World: Iceborne';
+					break;
+					case 'fr' : toIB_site =  'Monster Hunter World: Iceborne - Site officiel';
+					break;
+					case 'hk' : toIB_site =  '《Monster Hunter World: Iceborne》官方網站';
+					break;
+					case 'it' : toIB_site =  'Sito web ufficiale di Monster Hunter World: Iceborne';
+					break;
+					case 'kr' : toIB_site =  '\'Monster Hunter World: Iceborne\' 공식 사이트';
+					break;
+					case 'uk' : toIB_site =  'Monster Hunter World: Iceborne Official Website';
+					break;
+					case 'us' : toIB_site =  'Monster Hunter World: Iceborne Official Website';
+					break;
+				}
+				
+				if(bodyID === "ecosystem") {
+					var index = $(".contents-block").data("subnavi-index");
+					if(index != undefined) $(document).find(".snavi-child-list .btn-child-item").eq(index).addClass("current");
+					var initialSlide = catIndex > 0 ? catIndex : 0;
+					if(catIndex < 0) initialSlide = catIndex < 0 ? index : 0;
+					
+					$('.slider-item').slick({
+						dots: true,
+						infinite: true,
+						slidesToShow: 4,
+						slidesToScroll: 1,
+						initialSlide: initialSlide
+					});
+					var index = $(".sub-contents-area").data("subnavi-index");
+					if(index != undefined) $(".snavi-parents-list .btn-parents-item").eq(index).addClass("current");
+					
+					//190510 footer
+					if ( pageLink.indexOf('_') != -1){
+						var toIB_URL = 'monster';
+						switch(pageLang){
+							case 'cn' : toIB_text =  '点此查看新登场的怪物';
+							break;
+							case 'de' : toIB_text =  'Klicke hier für Details über die neuen Monster.';
+							break;
+							case 'es' : toIB_text =  'Haz click aquí para más información de los nuevos monstruos.';
+							break;
+							case 'fr' : toIB_text =  'Cliquez ici pour en savoir plus sur les nouveaux monstres';
+							break;
+							case 'hk' : toIB_text =  '按此看新登場的魔物';
+							break;
+							case 'it' : toIB_text =  'Clicca qui per dettagli sui nuovi mostri.';
+							break;
+							case 'kr' : toIB_text =  '새롭게 등장하는 몬스터';
+							break;
+							case 'uk' : toIB_text =  'Click here for details on the new monsters.';
+							break;
+							case 'us' : toIB_text =  'Click here for details on the new monsters.';
+							break;
+						}
+					} else {
+						var toIB_URL = 'ecosystem';
+						switch(pageLang){
+							case 'cn' : toIB_text =  '点此查看新舞台的生态系统';
+							break;
+							case 'de' : toIB_text =  'Klicke hier für Details über die neue Ökologie.';
+							break;
+							case 'es' : toIB_text =  'Haz click aquí para ver más información del nuevo ecosistema.';
+							break;
+							case 'fr' : toIB_text =  'Cliquez ici pour en savoir plus sur la nouvelle écologie';
+							break;
+							case 'hk' : toIB_text =  '按此看新舞台的生態系統';
+							break;
+							case 'it' : toIB_text =  'Clicca qui per dettagli sull\'ecologia.';
+							break;
+							case 'kr' : toIB_text =  '새로운 무대의 생태계';
+							break;
+							case 'uk' : toIB_text =  'Click here for details on the new ecology.';
+							break;
+							case 'us' : toIB_text =  'Click here for details on the new ecology.';
+							break;
+						}
+					}
+					
+					var toIB = '<div class="footer-contents bg-dark"><div class="btn-footer-link"><p><a href="//www.monsterhunter.com/world-iceborne/'+ pageLang + "/"+ toIB_URL +'" target="_blank" class=""><span><strong>'+ toIB_text +'</strong>' + toIB_site + '</span></a></p></div></div>';
+					$(toIB).appendTo('.link-to-top');
+					
+					
+				}
+				if(bodyID === "hunting") {
+					var index = $(".contents-block").data("subnavi-index");
+					if(index != undefined) $(document).find(".snavi-child-list .btn-child-item").eq(index).addClass("current");
+					var index = $(".sub-contents-area").data("subnavi-index");
+					if(index != undefined) $(".snavi-parents-list .btn-parents-item").eq(index).addClass("current");
+					readyPopupVideo();
+					
+					//190510 footer
+					var toIB_URL = 'hunting';
+					switch(pageLang){
+						case 'cn' : toIB_text =  '点此查看新的狩猎动作';
+						break;
+						case 'de' : toIB_text =  'Klicke hier für Details über die neuen Aktionen.';
+						break;
+						case 'es' : toIB_text =  'Haz click aquí para más información sobre los ataques nuevos.';
+						break;
+						case 'fr' : toIB_text =  'Cliquez ici pour en savoir plus sur les nouveautés du gameplay';
+						break;
+						case 'hk' : toIB_text =  '按此看新的狩獵動作';
+						break;
+						case 'it' : toIB_text =  'Clicca qui per dettagli sulle nuove azioni.';
+						break;
+						case 'kr' : toIB_text =  '새로운 헌팅 액션';
+						break;
+						case 'uk' : toIB_text =  'Click here for details on the new actions.';
+						break;
+						case 'us' : toIB_text =  'Click here for details on the new actions.';
+						break;
+					}
+					
+					var toIB = '<div class="footer-contents bg-dark"><div class="btn-footer-link"><p><a href="//www.monsterhunter.com/world-iceborne/'+ pageLang + "/"+ toIB_URL +'" target="_blank" class=""><span><strong>'+ toIB_text +'</strong>' + toIB_site + '</span></a></p></div></div>';
+					$(toIB).appendTo('.link-to-top');
+					
+				}
+				if(bodyID === "base") {
+					var index = $(".contents-block").data("subnavi-index");
+					if(index != undefined) $(document).find(".snavi-child-list .btn-child-item").eq(index).addClass("current");
+					var index = $(".sub-contents-area").data("subnavi-index");
+					if(index != undefined) $(".snavi-parents-list .btn-parents-item").eq(index).addClass("current");
+					
+					//190619 footer
+					var toIB_URL = 'base';
+					switch(pageLang){
+						case 'cn' : toIB_text =  '点此查看新据点“月辰”的介绍';
+						break;
+						case 'de' : toIB_text =  'Klicke hier, um mehr über Seliana zu erfahren.';
+						break;
+						case 'es' : toIB_text =  'Haz clic aquí para saber más sobre Seliana';
+						break;
+						case 'fr' : toIB_text =  'Cliquez ici pour en savoir plus sur Seliana';
+						break;
+						case 'hk' : toIB_text =  '按此看新據點「月辰」的介紹';
+						break;
+						case 'it' : toIB_text =  'Fai clic qui per scoprire Seliana';
+						break;
+						case 'kr' : toIB_text =  '새롭게 설치되는 거점 \'세리에나\'의 소개';
+						break;
+						case 'uk' : toIB_text =  'Click Here to Learn More about Seliana';
+						break;
+						case 'us' : toIB_text =  'Click Here to Learn More about Seliana';
+						break;
+					}
+					
+					var toIB = '<div class="footer-contents bg-dark"><div class="btn-footer-link"><p><a href="//www.monsterhunter.com/world-iceborne/'+ pageLang + "/"+ toIB_URL +'" target="_blank" class=""><span><strong>'+ toIB_text +'</strong>' + toIB_site + '</span></a></p></div></div>';
+					$(toIB).appendTo('.link-to-top');
+					
+					
+				}
+			}
+			isPageChanging = false;
+			$(".page-hide").removeClass("page-hide");
+			var $bgVideo = $(document).find(".bg-video");
+			var length = $bgVideo.length;
+			for(var i = 0; i < length; i++) {
+				$bgVideo.eq(i).YTPlayer();
+				$bgVideo.eq(i).on("YTPReady", function(e){
+					TweenMax.to($(this), 0, {
+				        opacity: 1,
+				        delay: 0.1,
+				        onCompleteScope:$(this),
+				        onComplete: function(){
+				        	if(bodyID != "top" && soundObj.isBgmPause) $(this).YTPSetVolume(0);
+				        	playBgVideo();
+				        }
+				    });
+				});
+			}
+		}
+		function playBgVideo() {
+			clearInterval(videoPlayTimer);
+			IntervalVideoPlay();
+		}
+		function pauseBgVideo() {
+			clearInterval(videoPlayTimer);
+			var $bgVideo = $(document).find(".bg-video");
+			var length = $bgVideo.length;
+			for(var i = 0; i < length; i++) {
+				$bgVideo.eq(i).YTPPause();
+			}
+		}
+		function readyPopupVideo() {
+			$(document).find('.modal').magnificPopup({
+				type: 'iframe',
+				mainClass: 'mfp-fade',
+				iframe: {
+			        patterns: {
+					    youtube: {
+	                       index: 'youtube.com', 
+	                       id: 'v=', 
+	                       src: '//www.youtube.com/embed/%id%'
+	                    }
+			        }
+			    },
+				removalDelay: 200,
+				preloader: false,
+				callbacks: {
+					open: function() {
+						hideNavBtn();
+						pauseBgVideo();
+						if(soundObj && !soundObj.isBgmPause) {
+							soundObj.changeBgmVolume(0, 800, 0, true);
+						}
+				    },
+				    close: function() {
+				    	showNavBtn();
+				    	playBgVideo();
+						if(soundObj && !soundObj.isBgmPause) {
+							soundObj.changeBgmVolume(soundObj.bgmVolume, 800, 0, false);
+						}
+				    }
+				}
+			});
+		}
+		function IntervalVideoPlay() {
+			videoPlayTimer = setInterval(function(){
+				var $bgVideo = $(document).find(".bg-video");
+				var length = $bgVideo.length;
+				for(var i = 0; i < length; i++) {
+					if($(document).find(".bg-video").eq(i).YTPGetPlayer() && !isPageChanging) {
+						if(bodyID == "top") {
+							if(($(window).scrollTop() + $(window).height() / 2) > $(document).find(".bg-video").eq(i).offset().top) {
+								$(document).find(".bg-video").eq(i).YTPPlay();		
+							}
+						}
+						else {
+							var $target = $(document).find(".bg-video").eq(i);
+							if($target.hasClass("video-to-img")) {
+								var nowTime = (Date.parse("2018/01/01 00:" + ($target.YTPGetTime().replace(/ /g, ""))) / 1000) + 1;
+								var totalTime = Date.parse("2018/01/01 00:" + ($target.YTPGetTotalTime().replace(/ /g, ""))) / 1000;
+								if(nowTime >= totalTime) {
+									$target.addClass("hide-video").addClass("hide-video-img");
+									$target.YTPPause();
+								}
+							}
+							if(!$target.hasClass("hide-video")) {
+								$target.YTPPlay();
+							}
+						}
+					}
+				}
+			}, 1000 / 12);
+		}
+		var FadeTransition = Barba.BaseTransition.extend({
+			start: function() {
+		  		beforeChange();
+				this.fadeIn();
+			},
+			fadeIn: function(){
+				var self = this;
+				setTimeout(function(){
+					self.done();
+				}, 500);
+			}
+		});
+		Barba.Pjax.getTransition = function() {
+			return FadeTransition;
+		};
+	});
+
+	function createLangBtn() {
+//		var siteDomeinJp = 'www.capcom.co.jp',
+//        siteDomeinGlobal = '',
+//        sitePathJp = 'monsterhunter/world',
+//        langUS = 'us',
+//        langUK = 'uk',
+//        langFR = 'fr',
+//        langIT = 'it',
+//        langDE = 'de',
+//        langES = 'es',
+//        langHK = 'hk';
+//
+//        // html（SP）
+//        var dropDownListSpHtml  = '<div class="selectTtl">';
+//        dropDownListSpHtml  += '<span class="status"><span class="statusTtl">Select Language</span></span>';
+//        dropDownListSpHtml  += '</div>';
+//        dropDownListSpHtml  += '<select class="ctSelect" name="language" onChange="location.href=value;">';
+//        dropDownListSpHtml  += '<option value="/' + langUS + '/sp/" class="'+ langUS +'" id="linkBtnUS">English[US]</option>';
+//        dropDownListSpHtml  += '<option value="/' + langUK + '/sp/" class="'+ langUK +'" id="linkBtnUK">English[UK]</option>';
+//        dropDownListSpHtml  += '<option value="/' + langFR + '/sp/" class="'+ langFR +'" id="linkBtnFR">Fran&ccedil;ais</option>';
+//        dropDownListSpHtml  += '<option value="/' + langIT + '/sp/" class="'+ langIT +'" id="linkBtnIT">Italiano</option>';
+//        dropDownListSpHtml  += '<option value="/' + langDE + '/sp/" class="'+ langDE +'" id="linkBtnDE">Deutsch</option>';
+//        dropDownListSpHtml  += '<option value="/' + langES + '/sp/" class="'+ langES +'" id="linkBtnES">Espa&ntilde;ol</option>';
+//        dropDownListSpHtml  += '<option value="/' + langHK + '/sp/" class="'+ langHK +'" id="linkBtnHK">繁體中文</option>';
+//        dropDownListSpHtml  += '<option value="//'+ siteDomeinJp +'/'+ sitePathJp +'/sp/" id="linkBtnJP" selected>日本語</option>';
+//        dropDownListSpHtml  += '</select>';
+//        $(document).find('.selectBox.dpSP').html(dropDownListSpHtml);
+//
+//        // html（PC）
+//        var
+//        dropDownListHtml  = '<div class="dropDownListOverlay"></div>';
+//        dropDownListHtml += '<span class="status"><span class="almostStatus">US</span><span class="statusTtl">Select Language</span></span>';
+//        dropDownListHtml += '<ul class="dropDownList">';
+//        dropDownListHtml += '<li id="linkBtnUS"><a href="/'+ langUS +'/" class="'+ langUS +'"><span class="almost">US</span><span class="language">English</span></a></li>';
+//        dropDownListHtml += '<li id="linkBtnUK"><a href="/'+ langUK +'/" class="'+ langUK +'"><span class="almost">UK</span><span class="language">English</span></a></li>';
+//        dropDownListHtml += '<li id="linkBtnFR"><a href="/'+ langFR +'/" class="'+ langFR +'"><span class="almost">FR</span><span class="language">Fran&ccedil;ais</span></a></li>';
+//        dropDownListHtml += '<li id="linkBtnIT"><a href="/'+ langIT +'/" class="'+ langIT +'"><span class="almost">IT</span><span class="language">Italiano</span></a></li>';
+//        dropDownListHtml += '<li id="linkBtnDE"><a href="/'+ langDE +'/" class="'+ langDE +'"><span class="almost">DE</span><span class="language">Deutsch</span></a></li>';
+//        dropDownListHtml += '<li id="linkBtnES"><a href="/'+ langES +'/" class="'+ langES +'"><span class="almost">ES</span><span class="language">Espa&ntilde;ol</span></a></li>';
+//        dropDownListHtml += '<li id="linkBtnHK"><a href="/'+ langHK +'/" class="'+ langHK +'"><span class="almost">HK</span><span class="language">繁體中文</span></a></li>';
+//        dropDownListHtml += '<li id="linkBtnJP"><a href="//'+ siteDomeinJp +'/'+ sitePathJp +'/"><span class="almost">JP</span><span class="language">日本語</span></a></li>';
+//        dropDownListHtml += '</ul>';
+//        $(document).find('.dropDown.dpPC').html(dropDownListHtml);
+//
+//        if(document.URL.match('/'+langUS +'/')) {
+//            $(document).find('.dropDownList #linkBtnUS').hide();
+//            $(document).find('.almostStatus').text('US');
+//            $(document).find('.statusTtl').text('Select Language');
+//            $(document).find('.ctSelect').val('/'+ langUS +'/');
+//        }
+//        if(document.URL.match('/'+langUK +'/')) {
+//            $(document).find('.dropDownList #linkBtnUK').hide();
+//            $(document).find('.almostStatus').text('UK');
+//            $(document).find('.statusTtl').text('Select Language');
+//            $(document).find('.ctSelect').val('/'+ langUK +'/');
+//        }
+//        if(document.URL.match('/'+langFR +'/')) {
+//            $(document).find('.dropDownList #linkBtnFR').hide();
+//            $(document).find('.almostStatus').text('FR');
+//            $(document).find('.statusTtl').text('Sélectionner la langue');
+//            $(document).find('.ctSelect').val('/'+ langFR +'/');
+//        }
+//        if(document.URL.match('/'+langIT +'/')) {
+//            $(document).find('.dropDownList #linkBtnIT').hide();
+//            $(document).find('.almostStatus').text('IT');
+//            $(document).find('.statusTtl').text('Cambia lingua');
+//            $(document).find('.ctSelect').val('/'+ langIT +'/');
+//        }
+//        if(document.URL.match('/'+langDE +'/')) {
+//            $(document).find('.dropDownList #linkBtnDE').hide();
+//            $(document).find('.almostStatus').text('DE');
+//            $(document).find('.statusTtl').text('Sprache wählen');
+//            $(document).find('.ctSelect').val('/'+ langDE +'/');
+//        }
+//        if(document.URL.match('/'+langES +'/')) {
+//            $(document).find('.dropDownList #linkBtnES').hide();
+//            $(document).find('.almostStatus').text('ES');
+//            $(document).find('.statusTtl').text('Elegir idioma');
+//            $(document).find('.ctSelect').val('/'+ langES +'/');
+//        }
+//        if(document.URL.match('/'+langHK +'/')) {
+//            $(document).find('.dropDownList #linkBtnHK').hide();
+//            $(document).find('.almostStatus').text('HK');
+//            $(document).find('.statusTtl').text('選擇語言');
+//            $(document).find('.ctSelect').val('/'+ langHK +'/');
+//        }
+		
+        // html（PC）
+        var dropDownListHtml = '<a href="/">Select Language</a>';
+        $(document).find('.dropDown.dpPC').html(dropDownListHtml);
+		
+				$(document).on('click','.dropDown a',function(){
+					var pageUrl = '/' + location.href.split('/')[3];
+//					$.cookie('_ga', "", {path: pageUrl,	expires: -1	});
+//					$.cookie('_gat', "", {path: pageUrl, expires: -1	});
+//					$.cookie('_gid', "", {path: pageUrl, expires: -1 });
+//					$.cookie('_gat_steamTracker', "", {path: '/', domain:pageUrl, expires: -1 });		
+//					$.cookie('langSelect', "", {path: pageUrl, expires: -1 });
+//					$.cookie('firstVisit', "", {path: pageUrl, expires: -1 });
+//					$.cookie('_ga', "", {path: '/',	domain:'.monsterhunterworld.com', expires: -1	});
+//					$.cookie('_gid', "", {path: '/', domain:'.monsterhunterworld.com', expires: -1 });
+//					$.cookie('_gat', "", {path: '/', domain:'.monsterhunterworld.com', expires: -1 });
+//					$.cookie('_gat_steamTracker', "", {path: '/', domain:'monsterhunterworld.com', expires: -1 });		
+////					$.cookie('langSelect', "", {path: '/', expires: -1 });
+////					$.cookie('firstVisit', "", {path: '/', expires: -1 });
+//					$.cookie('langSelect', "", {path: '/', domain:'.monsterhunterworld.com', expires: -1 });
+//					$.cookie('firstVisit', "", {path: '/', domain:'.monsterhunterworld.com', expires: -1 });
+//					$.cookie('_gat_steamTracker', "", {path: '/', expires: -1 });
+				});
+
+    }
+
+//    $(document).on('click', '.dropDown .status', function(){
+//        $(this).parent().toggleClass('active');
+//    });
+//    $(document).on('click', '.dropDown .dropDownList li, .dropDownListOverlay',function(){
+//        $(document).find('.dropDown').removeClass('active');
+//    });
+//    $(document).on('mouseleave', '.dropDown .dropDownList',function () {
+//        $(document).find('.dropDown').removeClass('active');
+//    });
+//    // PC
+//    $(document).on('click', '.dropDown .dropDownList li:not(#linkBtnJP)',function(){
+//        var selectLang = $(this).find('a').attr('class');
+//        $.cookie('langSelect', selectLang , {expires: 9999, path: '/'});
+//    });
+//    // SP
+//    $(document).on('change', '.ctSelect', function(){
+//        var selectLang = $(document).find('.ctSelect option:selected').attr('class');
+//        $.cookie('langSelect', selectLang, {expires: 9999, path: '/'});
+//    })
+});
