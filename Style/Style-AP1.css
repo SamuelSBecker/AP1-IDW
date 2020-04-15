@@ -10,13 +10,8 @@ header{
     justify-content: space-between;
 }
 #Bg-Video{
-    right: 0;
-    bottom: 0;
-    top:0;
-    left: 0;
     width: 1700px;
-    height: 800px;
-    margin: -25px -10px 0px -10px; 
+    margin: -40px -10px 0px -10px; 
 }
 #Fix-Logo{
     position: absolute;
@@ -37,7 +32,6 @@ header{
     font-size: 150%;
 }
 .Session{
-    text-align: start;
     width:100px;
     padding-top: 10px;
 }
@@ -56,8 +50,8 @@ header{
 }
 .Logo-End{
     width:300px;
-    height: 220px;
-    margin:50px 50px 10px 50px;
+    height: 180px;
+    margin:55px 50px 10px 50px;
 }
 .line{
     border:1px solid #444444;
@@ -65,7 +59,7 @@ header{
     margin: 0px 0px 0px 0px;
 }
 #Between{
-    justify-content: start;
+    justify-content: space-between;
     width: 30%;
     margin: 50px 0px 50px 20px;
 }
@@ -98,9 +92,8 @@ aside{
     font-size: 130%;
     color:#CCCCCC;
     width: 50%;
-    margin: 10px 10px 10px 10px;
-    padding-left: 10px;
-    padding-top: 10px;   
+    margin: 10px;
+    padding: 10px 0px 0px 10px;   
 }
 .Color{
     color:#CCCCCC;
